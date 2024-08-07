@@ -1,0 +1,4 @@
+                        
+
+
+Mango.Services.CouponAPI="https://localhost:7001"
