@@ -16,6 +16,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{0438628A-F5DA-4146-B579-88053D3C0998}"
 	ProjectSection(SolutionItems) = preProject
 		Notes for Project.txt = Notes for Project.txt
+		..\..\..\..\Pictures\Screenshots\MicroServices Application.png = ..\..\..\..\Pictures\Screenshots\MicroServices Application.png
 	EndProjectSection
 EndProject
 Global
