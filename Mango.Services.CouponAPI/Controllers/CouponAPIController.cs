@@ -4,6 +4,7 @@ using Mango.Services.CouponAPI.Data;
 using Mango.Services.CouponAPI.Models;
 using Mango.Services.CouponAPI.Models.DTOs;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Mango.Services.CouponAPI.Controllers
@@ -16,14 +17,14 @@ namespace Mango.Services.CouponAPI.Controllers
         #region CTOR
 
         private readonly AppDbContext _db;
-        private readonly IMapper _mapper;
+        //private readonly IMapper _mapper;
         private ResponceDTOs _responce;
 
-        public CouponAPIController(AppDbContext db,IMapper mapper)
+        public CouponAPIController(AppDbContext db)
         {
             _db = db;
-          _mapper = mapper;
-            _responce =new ResponceDTOs();
+            //_mapper = mapper;
+            _responce = new ResponceDTOs();
         }
 
 
@@ -31,8 +32,10 @@ namespace Mango.Services.CouponAPI.Controllers
 
 
         [HttpGet]
+        #region Get All Coupon
         public ResponceDTOs Get()
-        #region Get
+
+
         {
             try
             {
@@ -45,20 +48,157 @@ namespace Mango.Services.CouponAPI.Controllers
             {
 
                 _responce.IsSuccess = false;
-                _responce.Result= ex.Message;
+                _responce.Result = ex.Message;
             }
             return _responce;
         }
         #endregion
 
         [HttpGet]
+
+        #region Get Coupon by id
+
         [Route("{id=int}")]
         public ResponceDTOs Get(int id)
-        #region Get by id
         {
             try
             {
                 Coupon obj = _db.Coupons.First(a => a.CouponId == id);
+                //_responce.Result =_mapper.Map<CouponDTOs>(obj);
+
+                _responce.Result = obj;
+            }
+            catch (Exception ex)
+            {
+
+                _responce.IsSuccess = false;
+                _responce.Result = ex.Message;
+            }
+            return _responce;
+
+        }
+        #endregion
+
+        [HttpGet]
+
+        #region Get Coupon by Code
+
+        [Route("GetByCode/{Code}")]
+        public ResponceDTOs Get(string Code)
+        {
+            try
+            {
+                Coupon obj = _db.Coupons.FirstOrDefault(a => a.CouponCode.ToLower() == Code.ToLower());
+                if (obj is null)
+                {
+                    _responce.IsSuccess = false;
+                    _responce.Message = $"CouponCode > {Code.ToUpper()}  not found";
+                }
+                //_responce.Result =_mapper.Map<CouponDTOs>(obj);
+
+                _responce.Result = obj;
+            }
+            catch (Exception ex)
+            {
+
+                _responce.IsSuccess = false;
+                _responce.Result = ex.Message;
+            }
+            return _responce;
+
+        }
+        #endregion
+
+        #region Create Coupon
+        [HttpPost]
+        public ResponceDTOs CreateCoupon([FromBody] CouponDTOs coupon)
+        {
+            try
+            {
+                //Convert to DTO
+                var Coupon = new Coupon
+                {
+                    CouponCode = coupon.CouponCode,
+                    //CouponId = coupon.CouponId,
+                    DiscountAmount = coupon.DiscountAmount,
+                    MinAmount = coupon.MinAmount,
+
+                };
+
+                _db.Coupons.Add(Coupon);
+                 _db.SaveChanges();
+
+                _responce.IsSuccess=true;
+                _responce.Result = coupon;
+                _responce.Message = "Save Sucessfully";
+                return _responce;
+
+
+            }
+            catch (Exception)
+            {
+                _responce.Message = "Something went wronge ";
+                _responce.IsSuccess = false;
+                return _responce;
+            }
+        }
+
+        #endregion
+
+        #region Update Coupon
+        [HttpPut]
+        public ResponceDTOs UpdateCoupon([FromBody] CouponDTOs coupon)
+        {
+            try
+            {
+                //Convert to DTO
+                var Coupon = new Coupon
+                {
+                    CouponCode = coupon.CouponCode,
+                    CouponId = coupon.CouponId,
+                    DiscountAmount = coupon.DiscountAmount,
+                    MinAmount = coupon.MinAmount,
+
+                };
+
+                _db.Coupons.Update(Coupon);
+                _db.SaveChanges();
+
+                _responce.IsSuccess = true;
+                _responce.Result = coupon;
+                _responce.Message = "Save Sucessfully";
+                return _responce;
+
+
+            }
+            catch (Exception)
+            {
+                _responce.Message = "Something went wronge ";
+                _responce.IsSuccess = false;
+                return _responce;
+            }
+        }
+
+        #endregion
+
+        #region Get Coupon by id
+        [HttpDelete]
+        [Route("{id=int}")]
+        public ResponceDTOs DeleteCoupon(int id)
+        {
+            try
+            {
+                Coupon obj = _db.Coupons.First(a => a.CouponId == id);
+                if (obj == null)
+                {
+
+                    _responce.IsSuccess = false;
+                    _responce.Message = $"{id}  is not available i database";
+
+                }
+                _db.Coupons.Remove(obj);
+                _db.SaveChanges();
+
                 //_responce.Result =_mapper.Map<CouponDTOs>(obj);
 
                 _responce.Result = obj;
