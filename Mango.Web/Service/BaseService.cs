@@ -3,6 +3,7 @@ using Mango.Web.Service.IService; // Importing the IService namespace from the M
 using Microsoft.AspNetCore.Mvc.ModelBinding; // Importing the ModelBinding namespace from ASP.NET Core MVC
 using Newtonsoft.Json; // Importing the Json namespace from Newtonsoft for JSON serialization and deserialization
 using System; // Importing the System namespace for basic functionalities
+using System.Net;
 using System.Net.Http.Json; // Importing the Json namespace from System.Net.Http for JSON-related HTTP functionalities
 using System.Text; // Importing the Text namespace for text encoding functionalities
 using static Mango.Web.Utility.SD; // Importing static members from the SD class in Mango.Web.Utility namespace
@@ -34,6 +35,24 @@ namespace Mango.Web.Service // Defining the namespace for the service
                 }
 
                 HttpResponseMessage? apiResponce = null; // Declaring a variable to hold the HTTP response
+
+
+                switch (requestDTOs.ApiType)
+                {
+                    case ApiType.Post:
+                        message.Method = HttpMethod.Post;
+                        break;
+                    case ApiType.Delete:
+                        message.Method = HttpMethod.Delete;
+                        break;
+                    case ApiType.Put:
+                        message.Method = HttpMethod.Put;
+                        break;
+                    default:
+                        message.Method = HttpMethod.Get;
+                        break;
+                }
+                apiResponce = await client.SendAsync(message);
 
                 switch (apiResponce.StatusCode) // Switch statement to handle different HTTP status codes
                 {
