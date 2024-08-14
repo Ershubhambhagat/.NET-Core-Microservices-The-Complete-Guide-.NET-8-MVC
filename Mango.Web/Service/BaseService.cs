@@ -1,4 +1,5 @@
-﻿using Mango.Web.Models; // Importing the Models namespace from the Mango.Web project
+﻿#region  Using
+using Mango.Web.Models; // Importing the Models namespace from the Mango.Web project
 using Mango.Web.Service.IService; // Importing the IService namespace from the Mango.Web.Service project
 using Microsoft.AspNetCore.Mvc.ModelBinding; // Importing the ModelBinding namespace from ASP.NET Core MVC
 using Newtonsoft.Json; // Importing the Json namespace from Newtonsoft for JSON serialization and deserialization
@@ -8,10 +9,13 @@ using System.Net.Http.Json; // Importing the Json namespace from System.Net.Http
 using System.Text; // Importing the Text namespace for text encoding functionalities
 using static Mango.Web.Utility.SD; // Importing static members from the SD class in Mango.Web.Utility namespace
 
+#endregion
 namespace Mango.Web.Service // Defining the namespace for the service
 {
     public class BaseService : IBaseService // Defining the BaseService class that implements the IBaseService interface
     {
+        #region CTOR
+
         private readonly IHttpClientFactory _httpClientFactory; // Declaring a private readonly field for IHttpClientFactory
 
         public BaseService(IHttpClientFactory httpClientFactory) // Constructor for BaseService class
@@ -19,10 +23,14 @@ namespace Mango.Web.Service // Defining the namespace for the service
             _httpClientFactory = httpClientFactory; // Initializing the _httpClientFactory field with the provided IHttpClientFactory instance
         }
 
+        #endregion
         public async Task<ResponceDTOs?> SendAsync(RequestDTOs requestDTOs) // Asynchronous method to send an HTTP request
         {
+            #region  Try
             try // Start of try block to catch exceptions
             {
+                #region send an HTTP request
+
                 HttpClient client = _httpClientFactory.CreateClient("MangoAPI"); // Creating an HttpClient instance using the IHttpClientFactory
                 HttpRequestMessage message = new(); // Creating a new HttpRequestMessage instance
                 message.Headers.Add("Accept", "application/json"); // Adding an Accept header to the request to accept JSON responses
@@ -36,9 +44,11 @@ namespace Mango.Web.Service // Defining the namespace for the service
 
                 HttpResponseMessage? apiResponce = null; // Declaring a variable to hold the HTTP response
 
+                #endregion
 
                 switch (requestDTOs.ApiType)
                 {
+                    #region API Type
                     case ApiType.Post:
                         message.Method = HttpMethod.Post;
                         break;
@@ -51,16 +61,17 @@ namespace Mango.Web.Service // Defining the namespace for the service
                     default:
                         message.Method = HttpMethod.Get;
                         break;
+                        #endregion
                 }
                 apiResponce = await client.SendAsync(message);
 
                 switch (apiResponce.StatusCode) // Switch statement to handle different HTTP status codes
                 {
                     #region HttpStatusCode // Region for HTTP status code handling
-                   
+
                     #endregion // End of region for HTTP status code handling
                     #region HttpStatusCode1
-                   
+
                     case System.Net.HttpStatusCode.BadRequest:
                         return new()
                         {
@@ -290,12 +301,16 @@ namespace Mango.Web.Service // Defining the namespace for the service
                             Message = "Network Authentication Required"
                         };
                     #endregion
+
                     default: // Default case for handling other status codes
                         var apiContent = await apiResponce.Content.ReadAsStringAsync(); // Reading the response content as a string
                         var apiResponceDTOs = JsonConvert.DeserializeObject<ResponceDTOs>(apiContent); // Deserializing the response content to ResponceDTOs
                         return apiResponceDTOs; // Returning the deserialized response
                 }
-            }
+            } 
+            #endregion
+
+            #region catch Exception
             catch (Exception ex) // Catch block to handle exceptions
             {
                 var dto = new ResponceDTOs // Creating a new ResponceDTOs object to hold the error information
@@ -304,7 +319,8 @@ namespace Mango.Web.Service // Defining the namespace for the service
                     IsSuccess = false // Indicating that the request was not successful
                 };
                 return dto; // Returning the error response
-            }
+            } 
+            #endregion
         }
     }
 }

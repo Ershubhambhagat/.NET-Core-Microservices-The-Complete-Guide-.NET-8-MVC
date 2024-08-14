@@ -2,6 +2,7 @@
 using Mango.Web.Service.IService;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 namespace Mango.Web.Controllers
 {
     public class CouponController : Controller
@@ -40,7 +41,7 @@ namespace Mango.Web.Controllers
         public async Task<IActionResult> CouponCreate(CouponDTOs model)
         {
             //Server side validation 
-            if (ModelState.IsValid) 
+            if (ModelState.IsValid)
             {
                 ResponceDTOs responce = await _couponService.CreateCouponsAsync(model);
                 if (responce != null && responce.IsSuccess)
@@ -50,6 +51,37 @@ namespace Mango.Web.Controllers
             }
             return View(model);
         }
+        #endregion
+
+        #region Delete Coupon
+
+        #region This is only for page Open Delete Coupon Page Open
+        public async Task<IActionResult> CouponDelete(int couponId)
+        {
+            ResponceDTOs? responce = await _couponService.GetCouponByIdAsync(couponId);
+            if (responce != null && responce.IsSuccess)
+            {
+                CouponDTOs model = JsonConvert.DeserializeObject<CouponDTOs>(Convert.ToString(responce.Result));
+                return View(model);
+
+            }
+            return NotFound();
+        }
+        #endregion
+
+        [HttpPost]
+        public async Task<IActionResult> CouponDelete(CouponDTOs coupon)
+        {
+            ResponceDTOs? responce = await _couponService.DeleteCouponByIdAsync(coupon.CouponId);
+            if (responce != null && responce.IsSuccess)
+            {
+                return RedirectToAction(nameof(CouponIndex));
+
+
+            }
+            return View(coupon);
+        }
+
         #endregion
     }
 }
