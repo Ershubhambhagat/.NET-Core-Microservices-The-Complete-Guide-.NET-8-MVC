@@ -3,6 +3,7 @@ using Mango.Web.Service.IService;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Reflection;
 namespace Mango.Web.Controllers
 {
     public class CouponController : Controller
@@ -23,6 +24,10 @@ namespace Mango.Web.Controllers
             if (responce != null && responce.IsSuccess)
             {
                 list = JsonConvert.DeserializeObject<List<CouponDTOs>>(Convert.ToString(responce.Result));
+            }
+            else
+            {
+                TempData["error"] = responce?.Message;
             }
             return View(list);
         }
@@ -46,9 +51,17 @@ namespace Mango.Web.Controllers
                 ResponceDTOs responce = await _couponService.CreateCouponsAsync(model);
                 if (responce != null && responce.IsSuccess)
                 {
+                    TempData["success"] = $"{model.CouponCode} Created Successfully ✔️"; 
+
                     return RedirectToAction(nameof(CouponIndex));
+
+                }
+                else
+                {
+                    TempData["error"] = responce?.Message;
                 }
             }
+
             return View(model);
         }
         #endregion
@@ -75,8 +88,13 @@ namespace Mango.Web.Controllers
             ResponceDTOs? responce = await _couponService.DeleteCouponByIdAsync(coupon.CouponId);
             if (responce != null && responce.IsSuccess)
             {
-                return RedirectToAction(nameof(CouponIndex));
+                TempData["success"] = $"{coupon.CouponCode}  Delete Successfully";
 
+                return RedirectToAction(nameof(CouponIndex));
+            }
+            else
+            {
+                TempData["error"] = responce?.Message;
 
             }
             return View(coupon);
