@@ -1,6 +1,8 @@
 ﻿using Mango.Services.AuthAPI.Data;
 using Mango.Services.AuthAPI.Models;
 using Mango.Services.AuthAPI.Models.DTOs;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 
 namespace Mango.Services.AuthAPI.Service
@@ -22,9 +24,34 @@ namespace Mango.Services.AuthAPI.Service
         #endregion
 
         #region Auth Login
-        public Task<LoginResponceDTO> Login(LoginRequestDTO loginRequestDTO)
+        public async Task<LoginResponceDTO> Login(LoginRequestDTO loginRequestDTO)
         {
-            throw new NotImplementedException();
+            var user = _db.Users.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower());
+            bool isValid = await _userManager.CheckPasswordAsync(user, loginRequestDTO.Password);
+            if (user == null || !isValid)
+            {
+                return new LoginResponceDTO()
+                {
+                    User = null,
+                    Token = ""
+                };
+            }
+            //If user was Found , generate JWT Token
+
+            UserDTO userDTO = new UserDTO()
+            {
+                Email = user.Email,
+                Id = user.Id,
+                Name = user.Name,
+                PhoneNumber = user.PhoneNumber
+            };
+            LoginResponceDTO loginResponce = new()
+            {
+                User=userDTO,
+                Token=""
+                
+            };
+            return loginResponce;
         }
 
         #endregion

@@ -20,7 +20,7 @@ namespace Mango.Services.AuthAPI.Controllers
             _responce = new();
         }
 
-        #region register
+        #region Auth Register
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationRequestDTO model)
         {
@@ -35,11 +35,20 @@ namespace Mango.Services.AuthAPI.Controllers
             return Ok($"Name : {_responce.Result= model.Name} Added Successfully");
         }
         #endregion
-        #region Login
+
+        #region Auth Login
         [HttpPost("login")]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> Login([FromBody] LoginRequestDTO model)
         {
-            return Ok();
+            var loginResponce = await _authService.Login(model);
+                if (loginResponce.User == null)
+            {
+                _responce.IsSuccess = false;
+                _responce.Message = "UserName or Password is Incorrect";
+                return BadRequest(_responce);
+            }
+            _responce.Result=loginResponce;
+            return Ok(_responce);
         } 
         #endregion
     }
