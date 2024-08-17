@@ -11,13 +11,15 @@ namespace Mango.Services.AuthAPI.Service
     {
         #region CTOR
         private readonly AppDbContext _db;
+        private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthService(AppDbContext db, UserManager<ApplicationUser> userManager,
+        public AuthService(AppDbContext db, IJwtTokenGenerator jwtTokenGenerator, UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager)
         {
             _db = db;
+            _jwtTokenGenerator = jwtTokenGenerator;
             _userManager = userManager;
             _roleManager = roleManager;
         }
@@ -36,7 +38,9 @@ namespace Mango.Services.AuthAPI.Service
                     Token = ""
                 };
             }
-            //If user was Found , generate JWT Token
+            //If user was Found , Generate JWT Token
+
+            var token = _jwtTokenGenerator.GenerateToken(user);
 
             UserDTO userDTO = new UserDTO()
             {
@@ -47,9 +51,9 @@ namespace Mango.Services.AuthAPI.Service
             };
             LoginResponceDTO loginResponce = new()
             {
-                User=userDTO,
-                Token=""
-                
+                User = userDTO,
+                Token = token
+
             };
             return loginResponce;
         }
@@ -63,7 +67,7 @@ namespace Mango.Services.AuthAPI.Service
             {
                 UserName = registrationRequestDTO.Email,
                 Email = registrationRequestDTO.Email,
-                NormalizedEmail = registrationRequestDTO.Email.ToUpper()                ,
+                NormalizedEmail = registrationRequestDTO.Email.ToUpper(),
                 Name = registrationRequestDTO.Name,
                 PhoneNumber = registrationRequestDTO.PhoneNumber
             };
@@ -99,7 +103,7 @@ namespace Mango.Services.AuthAPI.Service
 
             }
             return $"Error : Something went wronge";
-        } 
+        }
         #endregion
     }
 }
