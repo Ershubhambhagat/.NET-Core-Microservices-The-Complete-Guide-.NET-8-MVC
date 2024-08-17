@@ -18,9 +18,11 @@ namespace Mango.Services.AuthAPI.Service
         public JwtTokenGenerator(IOptions<JwtOptions>jwtOptions)
         {
             _jwtOptions = jwtOptions.Value;
-        } 
+        }
 
         #endregion
+
+        #region GenerateToken
         public string GenerateToken(ApplicationUser applicationUser)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -40,10 +42,11 @@ namespace Mango.Services.AuthAPI.Service
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
               SecurityAlgorithms.HmacSha384Signature)
-            }; 
+            };
             #endregion
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
-        }
+        } 
+        #endregion
     }
 }

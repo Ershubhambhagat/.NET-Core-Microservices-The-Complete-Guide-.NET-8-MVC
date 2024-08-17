@@ -11,6 +11,8 @@ namespace Mango.Services.AuthAPI.Controllers
     [ApiController]
     public class AuthAPIController : ControllerBase
     {
+
+        #region CTOR
         private readonly IAuthService _authService;
         private ResponceDTO _responce;
 
@@ -18,7 +20,8 @@ namespace Mango.Services.AuthAPI.Controllers
         {
             _authService = authService;
             _responce = new();
-        }
+        } 
+        #endregion
 
         #region Auth Register
         [HttpPost("register")]
