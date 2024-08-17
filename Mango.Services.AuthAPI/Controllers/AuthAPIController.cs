@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Mango.Services.AuthAPI.Models.DTOs;
+using Mango.Services.AuthAPI.Service;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,18 +11,28 @@ namespace Mango.Services.AuthAPI.Controllers
     [ApiController]
     public class AuthAPIController : ControllerBase
     {
-        private readonly DbContext _dbContext;
+        private readonly IAuthService _authService;
+        private ResponceDTO _responce;
 
-        public AuthAPIController(DbContext dbContext)
+        public AuthAPIController(IAuthService authService)
         {
-            _dbContext = dbContext;
+            _authService = authService;
+            _responce = new();
         }
 
         #region register
         [HttpPost("register")]
-        public async Task<IActionResult> Register()
+        public async Task<IActionResult> Register([FromBody] RegistrationRequestDTO model)
         {
-            return Ok();
+            var res=await _authService.Register(model);
+            //check res is not null or Empty
+            if (!string.IsNullOrEmpty(res))
+            {
+                _responce.IsSuccess=false;
+                _responce.Message = res;
+                return BadRequest(_responce);
+            }
+            return Ok($"Name : {_responce.Result= model.Name} Added Successfully");
         }
         #endregion
         #region Login
