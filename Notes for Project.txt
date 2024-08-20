@@ -2,3 +2,6 @@
 
 
 Mango.Services.CouponAPI="https://localhost:7001"
+
++++++++++++++    #Consume Auth API in Web ++++++++++++++++++++++++
+
