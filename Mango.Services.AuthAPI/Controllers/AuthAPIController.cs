@@ -52,7 +52,23 @@ namespace Mango.Services.AuthAPI.Controllers
             }
             _responce.Result=loginResponce;
             return Ok(_responce);
-        } 
+        }
+        #endregion
+
+        #region Auth Login
+        [HttpPost("AssignRole")]
+        public async Task<IActionResult> AssignRole([FromBody] RegistrationRequestDTO model)
+        {
+            var assignRoleSuccess = await _authService.AssignRole(model.Email, model.Role.ToUpper());
+            if (!assignRoleSuccess)
+            {
+                _responce.IsSuccess = false;
+                _responce.Message = $"Error Enconter , Something Went Wronge with {model.Name}";
+                return BadRequest(_responce);
+            }
+            _responce.Result = assignRoleSuccess;
+            return Ok(_responce);
+        }
         #endregion
     }
 }

@@ -23,6 +23,28 @@ namespace Mango.Services.AuthAPI.Service
             _userManager = userManager;
             _roleManager = roleManager;
         }
+
+
+        #endregion
+
+        #region Assign Role
+        public async Task<bool> AssignRole(string email, string roleName)
+        {
+            var user = _db.Users.FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
+            if (user != null)
+            {    //cheking role exist or not  //this is async // to make sync .GetAwaiter().GetResult()
+                if (!_roleManager.RoleExistsAsync(roleName).GetAwaiter().GetResult())
+                {
+                    //create role if it dose not exist   //crearteasync are async to make sync .GetAwaiter().GetResult()
+                    _roleManager.CreateAsync(new IdentityRole (roleName)).GetAwaiter().GetResult();
+                }
+                await _userManager.AddToRoleAsync(user, roleName);
+                return true;
+
+            }
+            return false;
+
+        }
         #endregion
 
         #region Auth Login
@@ -100,7 +122,7 @@ namespace Mango.Services.AuthAPI.Service
             catch (Exception e)
             {
 
-
+                throw;
             }
             return $"Error : Something went wronge";
         }
