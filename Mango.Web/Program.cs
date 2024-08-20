@@ -14,6 +14,8 @@ builder.Services.AddHttpClient<ICouponService,CouponService>();
 
 //Retrive From AppSetting And Assign to value 
 SD.CouponAPIBase = builder.Configuration["ServiceUrls:CouponAPI"];
+SD.AuthAPIBase = builder.Configuration["ServiceUrls:AuthAPI"];
+
 
 
 //Register service

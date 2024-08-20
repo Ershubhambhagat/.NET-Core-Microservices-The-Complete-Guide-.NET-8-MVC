@@ -5,3 +5,18 @@ Mango.Services.CouponAPI="https://localhost:7001"
 
 +++++++++++++    #Consume Auth API in Web ++++++++++++++++++++++++
 
+
+1> SD.cs
+
+
+        public static string AuthAPIBase { get; set; }
+
+2> appsettings.json
+
+    "AuthAPI": "https://localhost:7002"
+
+3> Programe.cs
+
+    SD.AuthAPIBase = builder.Configuration["ServiceUrls:AuthAPI"];
+
+
