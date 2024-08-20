@@ -5,18 +5,49 @@ Mango.Services.CouponAPI="https://localhost:7001"
 
 +++++++++++++    #Consume Auth API in Web ++++++++++++++++++++++++
 
+________________________________________________________________________________________________________________
 
 1> SD.cs
 
 
         public static string AuthAPIBase { get; set; }
 
+
+________________________________________________________________________________________________________________
 2> appsettings.json
 
     "AuthAPI": "https://localhost:7002"
+    
 
+________________________________________________________________________________________________________________
 3> Programe.cs
 
     SD.AuthAPIBase = builder.Configuration["ServiceUrls:AuthAPI"];
+________________________________________________________________________________________________________________
+
+4>    InterFace and Implement 
+
+       public async Task<ResponceDTOs?> RegisterAsync(RegistrationRequestDTO registrationRequestDTO)
+        {
+            return await _baseService.SendAsync(new RequestDTOs
+            {
+                ApiType = SD.ApiType.Post,
+                Data = registrationRequestDTO,
+                Url = SD.AuthAPIBase + "/api/register"
+            });
+        } 
+
+________________________________________________________________________________________________________________
+
+5>Programe.cs
+
+    ||Resister Services in Programe.cs||
 
 
+        builder.Services.AddHttpClient<IAuthService, AuthService>();
+
+    ||scope implementation||
+
+        builder.Services.AddScoped<IAuthService,AuthService>();
+
+________________________________________________________________________________________________________________

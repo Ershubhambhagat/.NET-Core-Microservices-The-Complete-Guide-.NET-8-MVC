@@ -55,7 +55,7 @@ namespace Mango.Services.AuthAPI.Controllers
         }
         #endregion
 
-        #region Auth Login
+        #region Auth AssignRole
         [HttpPost("AssignRole")]
         public async Task<IActionResult> AssignRole([FromBody] RegistrationRequestDTO model)
         {
