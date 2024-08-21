@@ -4,6 +4,7 @@ using Mango.Web.Utility;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 
 namespace Mango.Web.Controllers
 {
@@ -24,11 +25,29 @@ namespace Mango.Web.Controllers
             LoginRequestDTO login = new();
             return View(login);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginRequestDTO loginRequestDTO)
+        {
+            ResponceDTOs responceDTOs = await _authService.LoginAsync(loginRequestDTO);
+
+            if (responceDTOs != null && responceDTOs.IsSuccess)
+            {
+                LoginResponceDTO loginResponceDTO = JsonConvert.
+                     DeserializeObject<LoginResponceDTO>(Convert.ToString(responceDTOs.Result));
+                return RedirectToAction("Index", "Home");
+
+            }
+            else
+            {
+                ModelState.AddModelError("CustomError", responceDTOs.Message);
+                return View(loginRequestDTO);
+            }
+        }
         #endregion
 
         #region Register
         [HttpGet]
-
         public IActionResult Register()
         {
             var roleList = new List<SelectListItem>()
@@ -60,6 +79,10 @@ namespace Mango.Web.Controllers
 
                 }
 
+            }
+            else
+            {
+                TempData["error"] = result.Message;
             }
             var roleList = new List<SelectListItem>()
             {
