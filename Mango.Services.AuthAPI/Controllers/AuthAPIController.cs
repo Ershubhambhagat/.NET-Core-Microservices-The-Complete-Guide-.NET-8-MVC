@@ -35,7 +35,7 @@ namespace Mango.Services.AuthAPI.Controllers
                 _responce.Message = res;
                 return BadRequest(_responce);
             }
-            return Ok($"Name : {_responce.Result= model.Name} Added Successfully");
+            return Ok(_responce);
         }
         #endregion
 
