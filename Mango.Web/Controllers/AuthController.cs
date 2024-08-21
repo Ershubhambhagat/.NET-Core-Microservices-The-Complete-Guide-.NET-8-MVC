@@ -1,7 +1,9 @@
 ﻿using Mango.Web.Models;
 using Mango.Web.Service.IService;
+using Mango.Web.Utility;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Mango.Web.Controllers
 {
@@ -27,8 +29,14 @@ namespace Mango.Web.Controllers
         #region Register
         [HttpGet]
 
-        public IActionResult Register()
+        public IActionResult Register(RegistrationRequestDTO registrationRequestDTO)
         {
+            var roleList = new List<SelectListItem>()
+            {
+                new SelectListItem{Text=SD.RoleAdmin,Value=SD.RoleAdmin},
+                new SelectListItem{Text=SD.RoleCustomer,Value=SD.RoleCustomer}
+            };
+            ViewBag.RoleList = roleList;
             return View();
         }
 
