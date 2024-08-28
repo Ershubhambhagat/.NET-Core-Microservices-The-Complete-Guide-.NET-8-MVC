@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Any;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 namespace Mango.Services.AuthAPI.Service
@@ -10,20 +11,17 @@ namespace Mango.Services.AuthAPI.Service
     public class JwtTokenGenerator : IJwtTokenGenerator
     {
         #region CTOR
-
         //There is no class implemantation for JwtOptions
-
-// so implement like option
+        // so implement like option
         private readonly JwtOptions _jwtOptions;
         public JwtTokenGenerator(IOptions<JwtOptions>jwtOptions)
         {
             _jwtOptions = jwtOptions.Value;
         }
-
         #endregion
 
         #region GenerateToken
-        public string GenerateToken(ApplicationUser applicationUser)
+        public string GenerateToken(ApplicationUser applicationUser, IEnumerable<string> roles)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret);
@@ -33,6 +31,7 @@ namespace Mango.Services.AuthAPI.Service
                 new Claim(JwtRegisteredClaimNames.Sub,applicationUser.Id),
                 new Claim(JwtRegisteredClaimNames.Name,applicationUser.UserName),
             };
+            clameList.AddRange(roles.Select(role=>new Claim(ClaimTypes.Role, role)));
             #region TokenDescriptor
             var tokenDescriptor = new SecurityTokenDescriptor
             {

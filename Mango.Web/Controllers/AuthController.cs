@@ -116,9 +116,9 @@ namespace Mango.Web.Controllers
         }
 
         #endregion
-        //this method say thay user login 
 
         #region SignInUser
+        //this method say thay user login 
         private async Task SignInUser(LoginResponceDTO model)
         {
 
@@ -138,7 +138,10 @@ namespace Mango.Web.Controllers
 
             identity.AddClaim(new Claim(ClaimTypes.Name,
                 jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email).Value));
-          
+
+            identity.AddClaim(new Claim(ClaimTypes.Role,
+               jwt.Claims.FirstOrDefault(u => u.Type =="role").Value));
+
 
 
             var principal = new ClaimsPrincipal(identity);
