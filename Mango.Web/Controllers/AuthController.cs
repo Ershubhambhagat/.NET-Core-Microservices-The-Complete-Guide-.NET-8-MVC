@@ -1,10 +1,14 @@
 ﻿using Mango.Web.Models;
 using Mango.Web.Service.IService;
 using Mango.Web.Utility;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Mango.Web.Controllers
 {
@@ -12,10 +16,13 @@ namespace Mango.Web.Controllers
     {
         #region CTOR
         private readonly IAuthService _authService;
-        public AuthController(IAuthService authService)
+        private readonly ITokenProvider _token;
+
+        public AuthController(IAuthService authService, ITokenProvider token)
         {
             _authService = authService;
-        } 
+            _token = token;
+        }
         #endregion
 
         #region Login
@@ -35,7 +42,10 @@ namespace Mango.Web.Controllers
             {
                 LoginResponceDTO loginResponceDTO = JsonConvert.
                      DeserializeObject<LoginResponceDTO>(Convert.ToString(responceDTOs.Result));
-                return RedirectToAction("Index", "Home");
+
+                await SignInUser(loginResponceDTO);
+                _token.SetToken(loginResponceDTO.Token);
+                return RedirectToAction("Index","Home");
 
             }
             else
@@ -64,7 +74,7 @@ namespace Mango.Web.Controllers
             ResponceDTOs result = await _authService.RegisterAsync(registration);
             ResponceDTOs assignRole;
 
-            if(result!=null && result.IsSuccess)
+            if (result != null && result.IsSuccess)
             {
                 if (string.IsNullOrEmpty(registration.Role))
                 {
@@ -72,13 +82,11 @@ namespace Mango.Web.Controllers
                 }
                 assignRole = await _authService.AssignRoleAsync(registration);
 
-                if(assignRole!=null && assignRole.IsSuccess)
+                if (assignRole != null && assignRole.IsSuccess)
                 {
                     TempData["success"] = "Registation Successfully";
                     return RedirectToAction(nameof(Login));
-
                 }
-
             }
             else
             {
@@ -99,9 +107,43 @@ namespace Mango.Web.Controllers
         #endregion
 
 
-        public IActionResult Logout()
+        #region LogOut
+        public async Task<IActionResult> Logout()
         {
-            return View();
+            await HttpContext.SignOutAsync();
+            _token.ClearToken();
+            return RedirectToAction("Index", "Home");
+        }
+
+        #endregion
+        //this method say thay user login 
+
+        #region SignInUser
+        private async Task SignInUser(LoginResponceDTO model)
+        {
+
+            var handler = new JwtSecurityTokenHandler();
+
+            var jwt = handler.ReadJwtToken(model.Token);
+
+            var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Email,
+                          jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email).Value));
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub,
+                jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub).Value));
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Name,
+                jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Name).Value));
+
+
+            identity.AddClaim(new Claim(ClaimTypes.Name,
+                jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email).Value));
+          
+
+
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            #endregion
         }
     }
 }
