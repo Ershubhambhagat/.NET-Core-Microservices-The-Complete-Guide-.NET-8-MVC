@@ -50,7 +50,8 @@ namespace Mango.Web.Controllers
             }
             else
             {
-                ModelState.AddModelError("CustomError", responceDTOs.Message);
+                TempData["error"]=responceDTOs.Message;
+                //ModelState.AddModelError("CustomError", responceDTOs.Message);
                 return View(loginRequestDTO);
             }
         }
@@ -101,11 +102,7 @@ namespace Mango.Web.Controllers
             return View(registration);
 
         }
-
-
-
         #endregion
-
 
         #region LogOut
         public async Task<IActionResult> Logout()
