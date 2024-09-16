@@ -113,6 +113,7 @@ namespace Mango.Services.CouponAPI.Controllers
 
         #region Create Coupon
         [HttpPost]
+        [Authorize(Roles ="ADMIN")]
         public ResponceDTOs CreateCoupon([FromBody] CouponDTOs coupon)
         {
             try
@@ -149,6 +150,7 @@ namespace Mango.Services.CouponAPI.Controllers
 
         #region Update Coupon
         [HttpPut]
+        [Authorize(Roles = "ADMIN")]
         public ResponceDTOs UpdateCoupon([FromBody] CouponDTOs coupon)
         {
             try
@@ -186,6 +188,8 @@ namespace Mango.Services.CouponAPI.Controllers
         #region Get Coupon by id
         [HttpDelete]
         [Route("{id=int}")]
+        [Authorize(Roles = "ADMIN")]
+
         public ResponceDTOs DeleteCoupon(int id)
         {
             try
