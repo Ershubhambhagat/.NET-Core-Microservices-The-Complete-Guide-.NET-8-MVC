@@ -17,14 +17,15 @@ namespace Mango.Web.Service // Defining the namespace for the service
         #region CTOR
 
         private readonly IHttpClientFactory _httpClientFactory; // Declaring a private readonly field for IHttpClientFactory
-
-        public BaseService(IHttpClientFactory httpClientFactory) // Constructor for BaseService class
+        private readonly ITokenProvider _tokenProvider;
+        public BaseService(IHttpClientFactory httpClientFactory, ITokenProvider tokenProvider) // Constructor for BaseService class
         {
             _httpClientFactory = httpClientFactory; // Initializing the _httpClientFactory field with the provided IHttpClientFactory instance
+            _tokenProvider = tokenProvider;
         }
 
         #endregion
-        public async Task<ResponceDTOs?> SendAsync(RequestDTOs requestDTOs) // Asynchronous method to send an HTTP request
+        public async Task<ResponceDTOs?> SendAsync(RequestDTOs requestDTOs, bool withBearer = true) // Asynchronous method to send an HTTP request
         {
             #region  Try
             try // Start of try block to catch exceptions
@@ -34,6 +35,11 @@ namespace Mango.Web.Service // Defining the namespace for the service
                 HttpClient client = _httpClientFactory.CreateClient("MangoAPI"); // Creating an HttpClient instance using the IHttpClientFactory
                 HttpRequestMessage message = new(); // Creating a new HttpRequestMessage instance
                 message.Headers.Add("Accept", "application/json"); // Adding an Accept header to the request to accept JSON responses
+                if (withBearer)
+                {
+                    var token = _tokenProvider.GetToken();
+                    message.Headers.Add("Authorization", $"Bearer {token}");
+                }
                 message.RequestUri = new Uri(requestDTOs.Url); // Setting the request URI from the RequestDTOs object
 
                 if (requestDTOs.Data != null) // Checking if there is data to be sent in the request
