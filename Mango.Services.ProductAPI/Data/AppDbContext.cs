@@ -14,6 +14,7 @@ namespace Mango.Services.ProductAPI.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            #region Seed Data 
 
             modelBuilder.Entity<Product>().HasData(new Product
             {
@@ -50,7 +51,8 @@ namespace Mango.Services.ProductAPI.Data
                 Description = " Quisque vel lacus ac magna, vehicula sagittis ut non lacus.<br/> Vestibulum arcu turpis, maximus malesuada neque. Phasellus commodo cursus pretium.",
                 ImageUrl = "https://placehold.co/600x400",
                 CategoryName = "Entree"
-            });
+            }); 
+            #endregion
         }
     }
 }
