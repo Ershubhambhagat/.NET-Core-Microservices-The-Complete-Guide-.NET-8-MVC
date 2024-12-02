@@ -101,5 +101,42 @@ namespace Mango.Web.Controllers
         }
 
         #endregion
+
+        #region Edit Product
+
+        #region This is only for page Open Edit Product Page Open
+        public async Task<IActionResult> ProductEdit(int ProductId)
+        {
+            ResponceDTOs? responce = await _ProductService.GetProductByIdAsync(ProductId);
+            if (responce != null && responce.IsSuccess)
+            {
+                ProductDTOs model = JsonConvert.DeserializeObject<ProductDTOs>(Convert.ToString(responce.Result));
+                return View(model);
+
+            }
+            return NotFound();
+        }
+        #endregion
+
+        [HttpPost]
+        public async Task<IActionResult> ProductEdit(ProductDTOs Product)
+        {
+            ResponceDTOs? responce = await _ProductService.UpdateProductsAsync(Product);
+            if (responce != null && responce.IsSuccess)
+            {
+                TempData["success"] = $"{Product.Name}  Update Successfully";
+
+                return RedirectToAction(nameof(ProductIndex));
+            }
+            else
+            {
+                TempData["error"] = responce?.Message;
+
+            }
+            return View(Product);
+        }
+
+        #endregion
+
     }
 }

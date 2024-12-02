@@ -17,13 +17,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{0438628A
 	ProjectSection(SolutionItems) = preProject
 		..\..\..\..\Pictures\Screenshots\MicroServices Application.png = ..\..\..\..\Pictures\Screenshots\MicroServices Application.png
 		Notes for Project.txt = Notes for Project.txt
+		..\..\..\..\Pictures\Screenshots\product List.png = ..\..\..\..\Pictures\Screenshots\product List.png
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mango.Web", "Mango.Web\Mango.Web.csproj", "{4FA05A59-EA5F-4F13-92D4-2593B1BF0DA8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mango.Services.AuthAPI", "Mango.Services.AuthAPI\Mango.Services.AuthAPI.csproj", "{395B379E-5D33-4627-B681-E2BA95BA6672}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.Services.ProductAPI", "Mango.Services.ProductAPI\Mango.Services.ProductAPI.csproj", "{1EFD78AD-3989-489F-95C3-4BBB3A80ACDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mango.Services.ProductAPI", "Mango.Services.ProductAPI\Mango.Services.ProductAPI.csproj", "{1EFD78AD-3989-489F-95C3-4BBB3A80ACDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
