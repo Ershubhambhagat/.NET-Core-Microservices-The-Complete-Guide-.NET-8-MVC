@@ -1,32 +1,55 @@
 using Mango.Web.Models;
+using Mango.Web.Service.IService;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace Mango.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        #region CTOR
 
-        public HomeController(ILogger<HomeController> logger)
+
+        private readonly IProductService _ProductService;
+        public HomeController(IProductService ProductService)
         {
-            _logger = logger;
+            _ProductService = ProductService;
         }
+        #endregion
 
-        public IActionResult Index()
+        #region IndexAsync
+        public async Task<IActionResult> IndexAsync()
         {
-            return View();
-        }
 
+            List<ProductDTOs>? list = new();
+            ResponceDTOs? responce=await _ProductService.GetAllProductsAsync();
+            if (responce != null && responce.IsSuccess)
+            {
+                list = JsonConvert.DeserializeObject<List<ProductDTOs>>(Convert.ToString(responce.Result));
+            }
+            else
+            {
+                TempData["error"] = responce?.Message;
+            }
+            return View(list);
+        } 
+        #endregion
+
+
+        #region Privacy
         public IActionResult Privacy()
         {
             return View();
         }
+        #endregion
 
+        #region Error
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        } 
+        #endregion
     }
 }
