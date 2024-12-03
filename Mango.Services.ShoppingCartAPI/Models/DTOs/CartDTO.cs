@@ -1,6 +1,6 @@
 ﻿using Mango.Services.ShoppingCartAPI.Models.DTOs;
 
-namespace Mango.Services.AuthAPI
+namespace Mango.Services.ShoppingCartAPI
 {
     public class CartDTO
     {
