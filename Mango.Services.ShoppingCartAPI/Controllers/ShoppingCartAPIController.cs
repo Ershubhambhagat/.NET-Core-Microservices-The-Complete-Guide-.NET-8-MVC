@@ -76,8 +76,8 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
                     {
                         // Update Count in Cart Details
                         cartDTO.CartDetails.First().Count += cartDetailsFromDB.Count;
-                        cartDTO.CartDetails.First().CartHeaderId += cartDetailsFromDB.CartHeaderId;
-                        cartDTO.CartDetails.First().CartDetailsId += cartDetailsFromDB.CartDetailsId;
+                        cartDTO.CartDetails.First().CartHeaderId = cartDetailsFromDB.CartHeaderId;
+                        cartDTO.CartDetails.First().CartDetailsId = cartDetailsFromDB.CartDetailsId;
                         #region CartDetails Mapping 
 
                         _db.CardDetails.Update(_mapper.Map<CardDetails>(cartDTO.CartDetails.First()));
