@@ -15,6 +15,7 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
     [ApiController]
     public class ShoppingCartAPIController : ControllerBase
     {
+        #region CTOR
         private readonly AppDbContext _db;
         private ResponceDTOs _response;
         private readonly IMapper _mapper; // Adding here but this is not working 
@@ -26,7 +27,13 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
             _mapper = mapper;
 
         }
+
+        #endregion
+
+
         [HttpPost("CartUpsert")]
+
+        #region CartUpsert
         public async Task<ResponceDTOs> CartUpsert(CartDTO cartDTO)
         {
             try
@@ -58,7 +65,7 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
                 {
                     //if Header is not null
                     // Check if detaiils has same product
-                    var cartDetailsFromDB = await _db.CardDetails.FirstOrDefaultAsync
+                    var cartDetailsFromDB = await _db.CardDetails.AsNoTracking().FirstOrDefaultAsync
                         (u => u.ProductId == cartDTO.CartDetails.First().ProductId &&
                     u.CartHeaderId == cartHeaderFromDB.CartHeaerId);
 
@@ -98,7 +105,48 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
             }
             return _response;
         }
+        #endregion
 
 
+        [HttpPost("RemoveCart")]
+
+        #region RemoveCart
+        public async Task<ResponceDTOs> RemoveCart([FromBody] int CartDeatisId)
+        {
+            try
+            {
+                //Retrive CartDetails Form Database 
+                CardDetails cardDetails = _db.CardDetails.First(u => u.CartDetailsId == CartDeatisId);
+
+                //Check Total CartItem if only one is there then remove header as well 
+                int totalCountOfCartItem = _db.CardDetails.Where(v => v.CartHeaderId == cardDetails.CartHeaderId).Count();
+                // remove cart Details Before Cart Header
+                _db.CardDetails.Remove(cardDetails);
+
+                //if 1 item is left then this is the last item in cart so removing header as well 
+                if (totalCountOfCartItem == 1)
+                {
+                    var cartHeaderToRemove = await _db.CartHeaders.FirstOrDefaultAsync
+                        (c => c.CartHeaerId == cardDetails.CartHeaderId);
+                    _db.CartHeaders.Remove(cartHeaderToRemove);
+
+                }
+                await _db.SaveChangesAsync();
+
+                _response.Result = true;
+
+            }
+            catch (Exception ex)
+            {
+
+                _response.Message = ex.Message.ToString();
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+        #endregion
+
+
+     
     }
 }
