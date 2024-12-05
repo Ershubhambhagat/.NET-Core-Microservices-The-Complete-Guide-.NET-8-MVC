@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Mango.Services.ShoppingCartAPI.Mapper;
 using AutoMapper;
+using Mango.Services.ShoppingCartAPI.Service.IService;
+using Mango.Services.ShoppingCartAPI.Service;
 
 
 
@@ -26,6 +28,10 @@ builder.Services.AddEndpointsApiExplorer();
 IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<IProductService, ProductServices>();
+
+builder.Services.AddHttpClient("Product", u => u.BaseAddress = 
+new Uri(builder.Configuration["ServiceUrls:ProductAPI"]));
 
 builder.Services.AddSwaggerGen(option =>
 {

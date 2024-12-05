@@ -2,6 +2,7 @@
 using Mango.Services.ShoppingCartAPI.Data;
 using Mango.Services.ShoppingCartAPI.Models;
 using Mango.Services.ShoppingCartAPI.Models.DTOs;
+using Mango.Services.ShoppingCartAPI.Service.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,17 +20,17 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
         private readonly AppDbContext _db;
         private ResponceDTOs _response;
         private readonly IMapper _mapper; // Adding here but this is not working 
+        private readonly IProductService _productService;
 
-        public ShoppingCartAPIController(AppDbContext db, IMapper mapper)//IMapper mapper
+        public ShoppingCartAPIController(AppDbContext db, IMapper mapper,IProductService productService)//IMapper mapper
         {
             _db = db;
             this._response = new ResponceDTOs();
             _mapper = mapper;
-
+            _productService = productService;
         }
 
         #endregion
-
 
         [HttpPost("CartUpsert")]
 
@@ -107,7 +108,6 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
         }
         #endregion
 
-
         [HttpPost("RemoveCart")]
 
         #region RemoveCart
@@ -146,7 +146,36 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
         }
         #endregion
 
+        [HttpGet("GetCart/{UserId}")]
 
-     
+        #region GetCartByUserId
+        public async Task<ResponceDTOs> GetCart(string UserId)
+        {
+            try
+            {
+                CartDTO cart = new()
+                {
+                    CartHeader = _mapper.Map<CartHeaderDTO>(_db.CartHeaders.First(u => u.UserId == UserId))
+
+                };
+                cart.CartDetails=_mapper.Map<IEnumerable<CartDetailsDTO>>(_db.CardDetails.
+                    Where(u=>u.CartHeaderId==cart.CartHeader.CartHeaerId));
+                IEnumerable<ProductDTO> productDTOs = await _productService.GetProducts();
+                foreach (var item in cart.CartDetails)
+                {
+                    item.Product = productDTOs.FirstOrDefault(u => u.ProductId == item.ProductId);
+                    Convert.ToInt32(cart.CartHeader.CartTotal += (item.Count * Convert.ToInt32(item.Product.Price)));
+                }
+                _response.Result = cart;
+            }
+            catch (Exception ex)
+            {
+
+                _response.Message = ex.Message.ToString();
+                _response.IsSuccess = false;
+            }
+            return _response;
+        } 
+        #endregion
     }
 }
