@@ -29,9 +29,18 @@ IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IProductService, ProductServices>();
+builder.Services.AddScoped<ICouponService,CouponService>();
 
+
+
+//Inject CouponAPI
 builder.Services.AddHttpClient("Product", u => u.BaseAddress = 
 new Uri(builder.Configuration["ServiceUrls:ProductAPI"]));
+
+//Inject CouponAPI
+builder.Services.AddHttpClient("Coupon", u => u.BaseAddress =
+new Uri(builder.Configuration["ServiceUrls:CouponAPI"]));
+
 
 builder.Services.AddSwaggerGen(option =>
 {

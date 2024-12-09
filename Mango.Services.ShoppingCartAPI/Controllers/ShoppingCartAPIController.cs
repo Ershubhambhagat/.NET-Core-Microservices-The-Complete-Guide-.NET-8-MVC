@@ -21,13 +21,15 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
         private ResponceDTOs _response;
         private readonly IMapper _mapper; // Adding here but this is not working 
         private readonly IProductService _productService;
+        private readonly ICouponService _couponService;
 
-        public ShoppingCartAPIController(AppDbContext db, IMapper mapper,IProductService productService)//IMapper mapper
+        public ShoppingCartAPIController(AppDbContext db, IMapper mapper,IProductService productService, ICouponService couponService)//IMapper mapper
         {
             _db = db;
             this._response = new ResponceDTOs();
             _mapper = mapper;
             _productService = productService;
+            _couponService = couponService;
         }
 
         #endregion
@@ -165,6 +167,19 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
                 {
                     item.Product = productDTOs.FirstOrDefault(u => u.ProductId == item.ProductId);
                     Convert.ToInt32(cart.CartHeader.CartTotal += (item.Count * Convert.ToInt32(item.Product.Price)));
+                }
+
+                // apply coupon if Any
+                if (!string.IsNullOrEmpty(cart.CartHeader.CouponCode)) 
+                {
+                    CouponDTO coupon = await _couponService.GetCoupon(cart.CartHeader.CouponCode);
+                    if (coupon != null)
+                    {
+                        cart.CartHeader.CartTotal -= coupon.DiscountAmount;
+                        //Populating discount
+                        cart.CartHeader.Discount = coupon.DiscountAmount;
+                    }
+
                 }
                 _response.Result = cart;
             }
