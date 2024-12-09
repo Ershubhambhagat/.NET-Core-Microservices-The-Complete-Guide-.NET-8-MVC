@@ -175,7 +175,56 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
                 _response.IsSuccess = false;
             }
             return _response;
-        } 
+        }
+        #endregion
+
+        [HttpPost("ApplyCoupon")]
+
+        #region ApplyCoupon
+
+        public async Task<object> ApplyCoupon([FromBody] CartDTO cartDto)
+        {
+            try
+            {
+                var cartFromdB = await _db.CartHeaders.FirstAsync(u => u.UserId == cartDto.CartHeader.UserId);
+                cartFromdB.CouponCode=cartDto.CartHeader.CouponCode;
+                _db.CartHeaders.Update(cartFromdB);
+                await _db.SaveChangesAsync();
+                _response.Result = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess=false;
+                _response.Message=ex.Message.ToString();
+                
+            }
+            return _response;   
+        }
+        #endregion
+
+
+        [HttpPost("RemoveCoupon")]
+
+        #region RemoveCoupon
+
+        public async Task<object> RemoveCoupon([FromBody] CartDTO cartDto)
+        {
+            try
+            {
+                var cartFromdB = await _db.CartHeaders.FirstAsync(u => u.UserId == cartDto.CartHeader.UserId);
+                cartFromdB.CouponCode ="";
+                _db.CartHeaders.Update(cartFromdB);
+                await _db.SaveChangesAsync();
+                _response.Result = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message.ToString();
+
+            }
+            return _response;
+        }
         #endregion
     }
 }
